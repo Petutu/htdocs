@@ -1,0 +1,49 @@
+
+
+
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Online Hry IS – Přehled</title>
+<link rel="stylesheet" href="assets/css/styles.css" />
+<script type="module">
+// jednoduchá indikace počtu nepřečtených z localStorage (mock)
+import { getUnreadCount } from './assets/js/messages.js';
+document.addEventListener('DOMContentLoaded', () => {
+const el = document.getElementById('unread');
+el.textContent = getUnreadCount();
+});
+</script>
+</head>
+<body>
+<header class="nav">
+<div class="brand">🎮 Online Hry IS</div>
+<nav>
+<a href="index.html" aria-current="page">Domů</a>
+<a href="register.html">Registrace</a>
+<a href="login.html">Přihlášení</a>
+<a href="inbox.html">Doručené (<span id="unread">0</span>)</a>
+<a href="sent.html">Odeslané</a>
+<a href="compose.html">Napsat</a>
+</nav>
+</header>
+
+
+<main class="container">
+<section class="card">
+<h1>Vítej, hráči!</h1>
+<p></p>
+<ul>
+<li><a href="register.html">Registrace</a></li>
+<li><a href="login.html">Přihlášení</a></li>
+<li><a href="compose.html">Napsat zprávu</a></li>
+</ul>
+</section>
+</main>
+</body>
+</html>
+
+
+

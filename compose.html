@@ -1,0 +1,62 @@
+<!doctype html>
+<link rel="stylesheet" href="assets/css/styles.css" />
+<script type="module">
+import { sendMessage, seedUsers } from './assets/js/messages.js';
+document.addEventListener('DOMContentLoaded', () => {
+seedUsers(); // zajistí demo uživatele v selectu
+const form = document.getElementById('composeForm');
+const sel = form.recipient;
+// naplnění příjemců
+const list = JSON.parse(localStorage.getItem('ohis_users')||'[]');
+sel.innerHTML = list.map(u => `<option value="${u.login}">${u.login}</option>`).join('');
+
+
+form.addEventListener('submit', (e) => {
+e.preventDefault();
+const to = sel.value;
+const subject = form.subject.value.trim();
+const body = form.body.value.trim();
+if (!to || !subject || !body) { alert('Vyplňte všechna pole'); return; }
+sendMessage({ recipient: to, subject, body });
+alert('Zpráva odeslána (frontend-only).');
+window.location.href = 'sent.html';
+});
+});
+</script>
+</head>
+<body>
+<header class="nav">
+<div class="brand">Online Hry</div>
+<nav>
+<a href="index.html">Domů</a>
+<a href="register.html">Registrace</a>
+<a href="login.html">Přihlášení</a>
+<a href="inbox.html">Doručené</a>
+<a href="sent.html">Odeslané</a>
+<a href="compose.html" aria-current="page">Napsat</a>
+</nav>
+</header>
+
+
+<main class="container">
+<section class="card">
+<h1>Napsat zprávu</h1>
+<form id="composeForm">
+<label>Komu
+<select name="recipient" required></select>
+</label>
+<label>Předmět
+<input name="subject" required maxlength="120" />
+</label>
+<label>Zpráva
+<textarea name="body" required rows="8" style="width:100%"></textarea>
+</label>
+<div class="actions">
+<button type="submit">Odeslat</button>
+</div>
+</form>
+<p class="hint"></p>
+</section>
+</main>
+</body>
+</html>

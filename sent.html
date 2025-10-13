@@ -1,0 +1,44 @@
+<!doctype html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Odeslané – Online Hry IS</title>
+<link rel="stylesheet" href="assets/css/styles.css" />
+<script type="module">
+import { listSent } from './assets/js/messages.js';
+document.addEventListener('DOMContentLoaded', () => {
+const tbody = document.querySelector('tbody');
+const items = listSent();
+tbody.innerHTML = items.map(m => `
+<tr>
+<td>${m.recipient}</td>
+<td>${m.subject}</td>
+<td>${new Date(m.createdAt).toLocaleString()}</td>
+</tr>`).join('');
+});
+</script>
+</head>
+<body>
+<header class="nav">
+<div class="brand">🎮 Online Hry IS</div>
+<nav>
+<a href="index.html">Domů</a>
+<a href="register.html">Registrace</a>
+<a href="login.html">Přihlášení</a>
+<a href="inbox.html">Doručené</a>
+<a href="sent.html" aria-current="page">Odeslané</a>
+<a href="compose.html">Napsat</a>
+</nav>
+</header>
+
+
+<main class="container">
+<section class="card">
+<h1>Odeslané</h1>
+<table class="table">
+<thead><tr><th>Komu</th><th>Předmět</th><th>Datum</th></tr></thead>
+<tbody></tbody>
+</table>
+</section>
+</main>
+</body>
+</html>

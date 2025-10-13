@@ -1,0 +1,42 @@
+<?php
+require_once __DIR__.'/../config/session.php';
+require_once __DIR__.'/../config/security.php';
+?>
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Přihlášení – Online Hry IS</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="brand">🎮 Online Hry IS</div>
+    <nav>
+      <a href="index.html">Domů</a>
+      <a href="register.html">Registrace</a>
+      <a href="login.html" aria-current="page">Přihlášení</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h1>Přihlášení</h1>
+      <form method="post" action="../actions/login_action.php" id="loginForm" novalidate>
+        <input type="hidden" name="csrf" value="<?= htmlspecialchars(ensure_csrf()) ?>">
+        <label>Login
+          <input required name="login" pattern="[A-Za-z0-9_]{4,30}" placeholder="player01" />
+        </label>
+        <label>Heslo
+          <input required type="password" name="password" placeholder="••••••••••" />
+        </label>
+        <div class="actions">
+          <button type="submit">Přihlásit</button>
+          <a class="link" href="register.html">Nemám účet → Registrace</a>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
