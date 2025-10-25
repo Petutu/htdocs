@@ -1,62 +1,64 @@
-<!doctype html>
-<link rel="stylesheet" href="assets/css/styles.css" />
-<script type="module">
-import { sendMessage, seedUsers } from './assets/js/messages.js';
-document.addEventListener('DOMContentLoaded', () => {
-seedUsers(); // zajistí demo uživatele v selectu
-const form = document.getElementById('composeForm');
-const sel = form.recipient;
-// naplnění příjemců
-const list = JSON.parse(localStorage.getItem('ohis_users')||'[]');
-sel.innerHTML = list.map(u => `<option value="${u.login}">${u.login}</option>`).join('');
-
-
-form.addEventListener('submit', (e) => {
-e.preventDefault();
-const to = sel.value;
-const subject = form.subject.value.trim();
-const body = form.body.value.trim();
-if (!to || !subject || !body) { alert('Vyplňte všechna pole'); return; }
-sendMessage({ recipient: to, subject, body });
-alert('Zpráva odeslána (frontend-only).');
-window.location.href = 'sent.html';
-});
-});
-</script>
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <title>Online Hry - Napsat zprávu</title>
 </head>
 <body>
-<header class="nav">
-<div class="brand">Online Hry</div>
-<nav>
-<a href="index.html">Domů</a>
-<a href="register.html">Registrace</a>
-<a href="login.html">Přihlášení</a>
-<a href="inbox.html">Doručené</a>
-<a href="sent.html">Odeslané</a>
-<a href="compose.html" aria-current="page">Napsat</a>
-</nav>
-</header>
+    <header class="nav">
+        <div class="brand">🎮 Online Hry IS</div>
+            <nav>
+            <a href="index.html">Domů</a>
+            <a href="register.html">Registrace</a>
+            <a href="login.html">Přihlášení</a>
+            <a href="inbox.html">Doručené</a>
+            <a href="sent.html" aria-current="page">Odeslané</a>
+            <a href="compose.html">Napsat</a>
+            </nav>
+    </header>
 
+    <main class="page">
+        <div class="hero">
+            
+            <div class="card">
+                <h1>Napsat zprávu</h1>
+                
+                <form action="#" method="POST">
+                    <div class="message-form-grid">
+                        
+                        <div class="message-recipient-wrap">
+                            <label class="field-label" for="recipient">Komu</label>
+                            <div class="input-wrap custom-select" id="recipient" aria-expanded="false">
+                                <span class="select-trigger">player01</span>
+                                <svg class="chev" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                                </div>
+                        </div>
+                        
+                        <div class="message-subject-wrap">
+                            <label class="field-label" for="subject">Předmět</label>
+                            <div class="input-wrap">
+                                <input type="text" id="subject" placeholder="Předmět">
+                            </div>
+                        </div>
+                    </div>
 
-<main class="container">
-<section class="card">
-<h1>Napsat zprávu</h1>
-<form id="composeForm">
-<label>Komu
-<select name="recipient" required></select>
-</label>
-<label>Předmět
-<input name="subject" required maxlength="120" />
-</label>
-<label>Zpráva
-<textarea name="body" required rows="8" style="width:100%"></textarea>
-</label>
-<div class="actions">
-<button type="submit">Odeslat</button>
-</div>
-</form>
-<p class="hint"></p>
-</section>
-</main>
+                    <div class="field message-body-field">
+                        <label class="field-label" for="message">Zpráva</label>
+                        <textarea id="message" rows="12" class="message-area"></textarea>
+                    </div>
+                    
+                    <div class="message-submit-action">
+                        <button type="submit" class="btn-primary">Odeslat</button>
+                    </div>
+                </form>
+
+            </div>
+            
+        </div>
+    </main>
+
 </body>
 </html>

@@ -1,47 +1,173 @@
-
-
-
+<?php
+require_once __DIR__.'/../config/session.php';
+require_once __DIR__.'/../config/security.php';
+?>
 <!doctype html>
 <html lang="cs">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Online Hry IS – Přehled</title>
-<link rel="stylesheet" href="assets/css/styles.css" />
-<script type="module">
-// jednoduchá indikace počtu nepřečtených z localStorage (mock)
-import { getUnreadCount } from './assets/js/messages.js';
-document.addEventListener('DOMContentLoaded', () => {
-const el = document.getElementById('unread');
-el.textContent = getUnreadCount();
-});
-</script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Online Hry IS – Přehled</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <script type="module" src="assets/js/messages.js"></script>
+  <style>
+    .dashboard {
+      display: grid;
+      grid-template-areas: 
+        "header header header"
+        "battle puzzle weekly"
+        "stats stats sidebar";
+      grid-template-columns: 1fr 1fr 1fr;  /* Rovnoměrné rozdělení */
+      gap: 24px;  /* Větší mezery */
+      padding: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Zvětšení výšky karet */
+    .game-card {
+      min-height: 320px;  /* Minimální výška */
+      display: flex;
+      flex-direction: column;
+    }
+
+    .game-content {
+      flex: 1;  /* Zabere zbývající prostor */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 0;
+    }
+
+    .header-area { grid-area: header; }
+    #game-battle { grid-area: battle; }
+    #game-puzzle { grid-area: puzzle; }
+    #game-weekly { grid-area: weekly; }
+    .stats-area { grid-area: stats; }
+    .sidebar { grid-area: sidebar; }
+
+    @media (max-width: 1200px) {
+      .dashboard {
+        grid-template-areas: 
+          "header header"
+          "battle puzzle"
+          "weekly stats"
+          "sidebar sidebar";
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard {
+        grid-template-areas: 
+          "header"
+          "battle"
+          "puzzle"
+          "weekly"
+          "stats"
+          "sidebar";
+        grid-template-columns: 1fr;
+      }
+      
+      .game-card {
+        min-height: 280px;
+      }
+    }
+  </style>
 </head>
 <body>
-<header class="nav">
-<div class="brand">🎮 Online Hry IS</div>
-<nav>
-<a href="index.html" aria-current="page">Domů</a>
-<a href="register.html">Registrace</a>
-<a href="login.html">Přihlášení</a>
-<a href="inbox.html">Doručené (<span id="unread">0</span>)</a>
-<a href="sent.html">Odeslané</a>
-<a href="compose.html">Napsat</a>
-</nav>
-</header>
+  <header class="nav">
+    <div class="brand">🎮 Online Hry IS</div>
+    <nav>
+      <a href="index.html" aria-current="page">Domů</a>
+      <a href="register.html">Registrace</a>
+      <a href="login.html">Přihlášení</a>
+      <a href="inbox.html">Doručené (<span id="unread">0</span>)</a>
+    </nav>
+  </header>
 
+  <main class="dashboard">
+    <header class="header-area card">
+      <h1>Přehled her</h1>
+      <p class="lead">Vyberte si z našich populárních titulů</p>
+    </header>
 
-<main class="container">
-<section class="card">
-<h1>Vítej, hráči!</h1>
-<p></p>
-<ul>
-<li><a href="register.html">Registrace</a></li>
-<li><a href="login.html">Přihlášení</a></li>
-<li><a href="compose.html">Napsat zprávu</a></li>
-</ul>
-</section>
-</main>
+    <section class="card game-card" id="game-battle">
+      <h2>Battle Arena</h2>
+      <div class="game-content">
+        <p>Rychlé zápasy 1v1 s průměrnou délkou 8 minut</p>
+        <div class="game-stats">
+          <span>1v1</span>
+          <span>⏱8min</span>
+          <span>Ranked</span>
+        </div>
+        <a href="play.html?game=battle" class="btn-primary">Hrát</a>
+      </div>
+    </section>
+
+    <section class="card game-card" id="game-puzzle">
+      <h1>Puzzle Quest</h1>
+      <div class="game-content">
+        <p>Kooperativní logické hry pro všechny věkové skupiny</p>
+        <div class="game-stats">
+          <span>Co-op</span>
+          <span>15min</span>
+          <span>4.8/5</span>
+        </div>
+        <a href="play.html?game=puzzle" class="btn-primary">Hrát</a>
+      </div>
+    </section>
+
+    <section class="card game-card" id="game-weekly">
+      <h2>Týdenní výzva</h2>
+      <div class="game-content">
+        <p>Speciální výzvy s extra odměnami</p>
+        <div class="game-stats">
+          <span>7 dní</span>
+          <span>3 úkoly</span>
+          <span>2x body</span>
+        </div>
+        <a href="events.html" class="btn-primary">Zúčastnit se</a>
+      </div>
+    </section>
+
+    <section class="card stats-area">
+      <h2>Statistiky serveru</h2>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <h3>Online hráči</h3>
+          <p class="stat-value">1,245</p>
+        </div>
+        <div class="stat-box">
+          <h3>Dnešní zápasy</h3>
+          <p class="stat-value">8,392</p>
+        </div>
+        <div class="stat-box">
+          <h3>Aktivní turnaje</h3>
+          <p class="stat-value">3</p>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card sidebar">
+      <h2>Žebříček celkových bodů</h2>
+      <ol class="leaderboard">
+        <li><strong>player01</strong><span>: 2,420</span></li>
+        <li><strong>gamerX</strong><span>: 1,980</span></li>
+        <li><strong>alice</strong><span>: 1,540</span></li>
+        <li><strong>proGamer</strong><span>: 870</span></li>
+        <li><strong>noobMaster</strong><span>: 230</span></li>
+      </ol>
+  </main>
+
+  <script type="module">
+    import { getUnreadCount } from './assets/js/messages.js';
+    document.addEventListener('DOMContentLoaded', () => {
+      const el = document.getElementById('unread');
+      if(el) el.textContent = getUnreadCount();
+    });
+  </script>
 </body>
 </html>
 

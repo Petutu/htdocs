@@ -1,44 +1,98 @@
 <!doctype html>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Odeslané – Online Hry IS</title>
-<link rel="stylesheet" href="assets/css/styles.css" />
-<script type="module">
-import { listSent } from './assets/js/messages.js';
-document.addEventListener('DOMContentLoaded', () => {
-const tbody = document.querySelector('tbody');
-const items = listSent();
-tbody.innerHTML = items.map(m => `
-<tr>
-<td>${m.recipient}</td>
-<td>${m.subject}</td>
-<td>${new Date(m.createdAt).toLocaleString()}</td>
-</tr>`).join('');
-});
-</script>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Odeslané – Online Hry IS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <script type="module">
+    import { listSent, filterMessages } from './assets/js/messages.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const tbody = document.querySelector('tbody');
+      const items = listSent();
+      const filterSelect = document.querySelector('input[name="filter"]');
+      
+      function updateTable(filter = '') {
+        const filtered = filterMessages(items, filter);
+        tbody.innerHTML = filtered.map(m => `
+          <tr>
+            <td>${m.recipient}</td>
+            <td>${m.subject}</td>
+            <td>${new Date(m.createdAt).toLocaleString()}</td>
+          </tr>`).join('');
+      }
+
+      // Inicializace custom selectu
+      document.querySelector('.custom-select').addEventListener('click', function(e) {
+        if(e.target.classList.contains('opt')) {
+          filterSelect.value = e.target.dataset.value;
+          updateTable(filterSelect.value);
+        }
+      });
+
+      // První načtení
+      updateTable();
+    });
+  </script>
 </head>
 <body>
-<header class="nav">
-<div class="brand">🎮 Online Hry IS</div>
-<nav>
-<a href="index.html">Domů</a>
-<a href="register.html">Registrace</a>
-<a href="login.html">Přihlášení</a>
-<a href="inbox.html">Doručené</a>
-<a href="sent.html" aria-current="page">Odeslané</a>
-<a href="compose.html">Napsat</a>
-</nav>
-</header>
+  <header class="nav">
+    <div class="brand">🎮 Online Hry IS</div>
+    <nav>
+      <a href="index.html">Domů</a>
+      <a href="register.html">Registrace</a>
+      <a href="login.html">Přihlášení</a>
+      <a href="inbox.html">Doručené</a>
+      <a href="sent.html" aria-current="page">Odeslané</a>
+      <a href="compose.html">Napsat</a>
+    </nav>
+  </header>
 
+  <main class="page">
+    <div class="hero">
+      <div class="hero-inner">
+        <section class="card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:24px">
+            <div>
+              <h1>Odeslané zprávy</h1>
+              <p class="lead">Historie odeslaných zpráv</p>
+            </div>
 
-<main class="container">
-<section class="card">
-<h1>Odeslané</h1>
-<table class="table">
-<thead><tr><th>Komu</th><th>Předmět</th><th>Datum</th></tr></thead>
-<tbody></tbody>
-</table>
-</section>
-</main>
+            <div class="field" style="margin:0">
+              <span class="field-label">Filtrovat podle</span>
+              <div class="input-wrap">
+                <div class="custom-select" data-name="filter" aria-haspopup="listbox" tabindex="0" role="button" aria-expanded="false">
+                  <input type="hidden" name="filter" />
+                  <span class="select-trigger">Vše</span>
+                  <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
+                  <ul class="select-options" role="listbox" aria-label="Filtr">
+                    <li data-value="" aria-selected="true" class="opt">Vše</li>
+                    <li data-value="today" aria-selected="false" class="opt">Dnes</li>
+                    <li data-value="week" aria-selected="false" class="opt">Tento týden</li>
+                    <li data-value="month" aria-selected="false" class="opt">Tento měsíc</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="table-wrapper">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Komu</th>
+                  <th>Předmět</th>
+                  <th>Datum</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
 </body>
 </html>

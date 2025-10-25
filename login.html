@@ -8,6 +8,7 @@ require_once __DIR__.'/../config/security.php';
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Přihlášení – Online Hry IS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
@@ -20,23 +21,51 @@ require_once __DIR__.'/../config/security.php';
     </nav>
   </header>
 
-  <main class="container">
-    <section class="card">
-      <h1>Přihlášení</h1>
-      <form method="post" action="../actions/login_action.php" id="loginForm" novalidate>
-        <input type="hidden" name="csrf" value="<?= htmlspecialchars(ensure_csrf()) ?>">
-        <label>Login
-          <input required name="login" pattern="[A-Za-z0-9_]{4,30}" placeholder="player01" />
-        </label>
-        <label>Heslo
-          <input required type="password" name="password" placeholder="••••••••••" />
-        </label>
-        <div class="actions">
-          <button type="submit">Přihlásit</button>
-          <a class="link" href="register.html">Nemám účet → Registrace</a>
-        </div>
-      </form>
-    </section>
+  <main class="page">
+    <div class="hero">
+      <div class="hero-inner">
+        <section class="card">
+          <h1>Přihlášení</h1>
+          <p class="lead">Přihlaste se do svého účtu a začněte hrát.</p>
+          <form method="post" action="../actions/login_action.php" id="loginForm" novalidate>
+            <input type="hidden" name="csrf" value="<?= htmlspecialchars(ensure_csrf()) ?>">
+            <label class="field">
+              <span class="field-label">Login</span>
+              <div class="input-wrap">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 6v2h18v-2c0-3.5-4-6-9-6z"/></svg>
+                <input id="login" required name="login" pattern="[A-Za-z0-9_]{4,30}" placeholder="player01" autocomplete="username" />
+              </div>
+            </label>
+
+            <label class="field">
+              <h2>
+              <span class="field-label">Heslo</span>
+              </h2>
+              <div class="input-wrap">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 8V7a5 5 0 0 0-10 0v1H5v12h14V8h-2zM9 7a3 3 0 0 1 6 0v1H9V7zm3 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+                <input id="password" required type="password" name="password" placeholder="••••••••" autocomplete="current-password" />
+              </div>
+            </label>
+
+            <div class="actions">
+              <button class="btn-primary" type="submit">Přihlásit</button>
+              <a class="link" href="register.html">Nemám účet → Registrace</a>
+            </div>
+          </form>
+        </section>
+        <aside class="panel">
+          <h2>Proč se registrovat?</h2>
+          <ul>
+            <li>Ukládání skóre a pokroku</li>
+            <li>Speciální soutěže a odměny</li>
+            <li>Rychlé přihlášení a správa profilu</li>
+            <h2>
+            <a class="link" href="register.html">Chci výhody!</a>
+            </h2>
+          </ul>
+        </aside>
+      </div>
+    </div>
   </main>
 </body>
 </html>
