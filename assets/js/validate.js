@@ -117,8 +117,8 @@ if (imgErr) errors.push(imgErr);
 if (errors.length) { showErrors(errors); return; }
 
 
-// Simulace úspěšné registrace (frontend-only)
-alert('Registrace OK (frontend-only).');
-window.location.href = 'login.html';
+
+alert('Registrace OK.');
+window.location.href = 'login.php';
 });
 });

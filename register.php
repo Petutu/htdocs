@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__.'/../config/session.php';
-require_once __DIR__.'/../config/security.php';
+require_once __DIR__.'/config/session.php';
+require_once __DIR__.'/config/security.php';
 ?>
 <!doctype html>
 <html lang="cs">
@@ -10,15 +10,15 @@ require_once __DIR__.'/../config/security.php';
   <title>Registrace – Online Hry IS</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css" />
-  <script type="module" src="assets/js/validate.js"></script>
+  <!-- <script type="module" src="assets/js/validate.js"></script> -->
 </head>
 <body>
   <header class="nav">
     <div class="brand">🎮 Online Hry IS</div>
     <nav>
-      <a href="index.html">Domů</a>
-      <a href="register.html" aria-current="page">Registrace</a>
-      <a href="login.html">Přihlášení</a>
+      <a href="index.php">Domů</a>
+      <a href="register.php" aria-current="page">Registrace</a>
+      <a href="login.php">Přihlášení</a>
     </nav>
   </header>
 
@@ -29,14 +29,14 @@ require_once __DIR__.'/../config/security.php';
           <h1>Vytvořit účet</h1>
           <p class="lead">Zaregistrujte se a začněte sbírat skóre a odměny.</p>
 
-          <form method="post" action="../actions/register_action.php" enctype="multipart/form-data" id="registerForm" novalidate>
+          <form method="post" action="/actions/register_action.php" enctype="multipart/form-data" id="registerForm" novalidate>
             <input type="hidden" name="csrf" value="<?= htmlspecialchars(ensure_csrf()) ?>">
 
             <div class="field">
               <span class="field-label">Jméno</span>
               <div class="input-wrap">
                 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 6v2h18v-2c0-3.5-4-6-9-6z"/></svg>
-                <input required name="first_name" maxlength="50" placeholder="Alex" autocomplete="given-name" />
+                <input name="first_name" maxlength="50" placeholder="Alex" autocomplete="given-name" />
               </div>
             </div>
 
@@ -44,7 +44,7 @@ require_once __DIR__.'/../config/security.php';
               <span class="field-label">Příjmení</span>
               <div class="input-wrap">
                 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 6v2h18v-2c0-3.5-4-6-9-6z"/></svg>
-                <input required name="last_name" maxlength="50" placeholder="Nováková" autocomplete="family-name" />
+                <input name="last_name" maxlength="50" placeholder="Nováková" autocomplete="family-name" />
               </div>
             </div>
 
@@ -52,7 +52,7 @@ require_once __DIR__.'/../config/security.php';
               <span class="field-label">Email</span>
               <div class="input-wrap">
                 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
-                <input required type="email" name="email" maxlength="120" placeholder="alex@example.com" autocomplete="email" />
+                <input type="email" name="email" maxlength="120" placeholder="alex@example.com" autocomplete="email" />
               </div>
             </div>
 
@@ -60,7 +60,7 @@ require_once __DIR__.'/../config/security.php';
               <span class="field-label">Telefon</span>
               <div class="input-wrap">
                 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.6 10.79a15.07 15.07 0 006.61 6.61l2.2-2.2a1 1 0 01.95-.27 11.36 11.36 0 003.56.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h2.5a1 1 0 011 1 11.36 11.36 0 00.57 3.56 1 1 0 01-.27.95l-2.2 2.28z"/></svg>
-                <input required type="tel" name="phone" maxlength="20" pattern="\+?[0-9\s-]{7,20}" placeholder="+420 777 123 456" autocomplete="tel" />
+                <input type="tel" name="phone" maxlength="20" pattern="\+?[0-9\s-]{7,20}" placeholder="+420 777 123 456" autocomplete="tel" />
               </div>
             </div>
 
@@ -68,7 +68,7 @@ require_once __DIR__.'/../config/security.php';
               <span class="field-label">Pohlaví</span>
               <div class="input-wrap">
                 <div class="custom-select" data-name="gender" aria-haspopup="listbox" tabindex="0" role="button" aria-expanded="false">
-                  <input type="hidden" name="gender" required />
+                  <input type="hidden" name="gender" />
                   <span class="select-trigger">Vyberte…</span>
                   <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
                   <ul class="select-options" role="listbox" aria-label="Pohlaví">
@@ -116,7 +116,7 @@ require_once __DIR__.'/../config/security.php';
                 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14h18zM8 7a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm1 8l2.5-3 3.5 4.5H9z"/></svg>
                 <label class="file-btn" for="photoInput">Vybrat soubor</label>
                 <span class="file-name">Soubor nevybrán</span>
-                <input id="photoInput" class="file-input" required type="file" name="photo" accept="image/jpeg,image/png,image/gif,image/bmp" />
+                <input id="photoInput" class="file-input" type="file" name="photo" accept="image/jpeg,image/png,image/gif,image/bmp" />
                 <button type="button" class="btn-clear" title="Odstranit soubor" aria-hidden="true">✕</button>
                 <div class="file-preview" aria-hidden="true"></div>
               </div>
@@ -124,7 +124,7 @@ require_once __DIR__.'/../config/security.php';
 
             <div class="actions" style="margin-top:18px">
               <button class="btn-primary" type="submit">Registrovat</button>
-              <a class="link" href="login.html">Mám účet → Přihlášení</a>
+              <a class="link" href="login.php">Mám účet → Přihlášení</a>
             </div>
           </form>
         </section>
@@ -136,14 +136,13 @@ require_once __DIR__.'/../config/security.php';
             <li>Speciální soutěže a odměny</li>
             <li>Rychlé přihlášení a správa profilu</li>
           </ul>
-          <a class="link" href="login.html" style="display:inline-block;margin-top:12px">Už mám účet</a>
+          <a class="link" href="login.php" style="display:inline-block;margin-top:12px">Už mám účet</a>
         </aside>
       </div>
     </div>
   </main>
 
   <script>
-    // jednoduchý toggle hesla (bez závislosti na validate.js)
     document.getElementById('pwToggle')?.addEventListener('click', function(){
       const p = document.getElementById('password');
       if(!p) return;

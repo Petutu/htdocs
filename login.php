@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__.'/../config/session.php';
-require_once __DIR__.'/../config/security.php';
+require_once __DIR__.'/config/session.php';
+require_once __DIR__.'/config/security.php';
 ?>
 <!doctype html>
 <html lang="cs">
@@ -15,9 +15,9 @@ require_once __DIR__.'/../config/security.php';
   <header class="nav">
     <div class="brand">🎮 Online Hry IS</div>
     <nav>
-      <a href="index.html">Domů</a>
-      <a href="register.html">Registrace</a>
-      <a href="login.html" aria-current="page">Přihlášení</a>
+      <a href="index.php">Domů</a>
+      <a href="register.php">Registrace</a>
+      <a href="login.php" aria-current="page">Přihlášení</a>
     </nav>
   </header>
 
@@ -27,8 +27,11 @@ require_once __DIR__.'/../config/security.php';
         <section class="card">
           <h1>Přihlášení</h1>
           <p class="lead">Přihlaste se do svého účtu a začněte hrát.</p>
-          <form method="post" action="../actions/login_action.php" id="loginForm" novalidate>
+
+          <!-- ZACHOVÁN STEJNÝ VZHLED, jen akce míří na PHP backend + CSRF -->
+          <form method="post" action="actions/login_action.php" id="loginForm" novalidate>
             <input type="hidden" name="csrf" value="<?= htmlspecialchars(ensure_csrf()) ?>">
+
             <label class="field">
               <span class="field-label">Login</span>
               <div class="input-wrap">
@@ -38,9 +41,7 @@ require_once __DIR__.'/../config/security.php';
             </label>
 
             <label class="field">
-              <h2>
               <span class="field-label">Heslo</span>
-              </h2>
               <div class="input-wrap">
                 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 8V7a5 5 0 0 0-10 0v1H5v12h14V8h-2zM9 7a3 3 0 0 1 6 0v1H9V7zm3 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
                 <input id="password" required type="password" name="password" placeholder="••••••••" autocomplete="current-password" />
@@ -49,19 +50,18 @@ require_once __DIR__.'/../config/security.php';
 
             <div class="actions">
               <button class="btn-primary" type="submit">Přihlásit</button>
-              <a class="link" href="register.html">Nemám účet → Registrace</a>
+              <a class="link" href="register.php">Nemám účet → Registrace</a>
             </div>
           </form>
         </section>
+
         <aside class="panel">
           <h2>Proč se registrovat?</h2>
           <ul>
             <li>Ukládání skóre a pokroku</li>
             <li>Speciální soutěže a odměny</li>
             <li>Rychlé přihlášení a správa profilu</li>
-            <h2>
-            <a class="link" href="register.html">Chci výhody!</a>
-            </h2>
+            <h2><a class="link" href="register.php">Chci výhody!</a></h2>
           </ul>
         </aside>
       </div>
