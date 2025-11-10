@@ -48,15 +48,16 @@ $csrf  = ensure_csrf();
 <h1>Doručené</h1>
 <div class="table-wrapper">
 <table class="table">
-  <thead><tr><th>Od</th><th>Předmět</th><th>Datum</th><th>OBSAH</th><th>stav</th></tr></thead>
+  <thead><tr><th>Od</th><th>Předmět</th><th>Datum</th><th>stav</th><th>Obsah</th></tr></thead>
   <tbody>
   <?php while($m = $items->fetch_assoc()): ?>
     <tr class="<?= $m['PRECTENO'] ? '' : 'row-unread' ?>">
       <td><?= htmlspecialchars($m['sender']) ?></td>
       <td><?= htmlspecialchars($m['PREDMET']) ?></td>
       <td><?= htmlspecialchars($m['DATUM']) ?></td>
-      <td><?= htmlspecialchars($m['OBSAH']) ?></td>
       <td><?= $m['PRECTENO'] ? 'přečteno' : '<b>nové</b>' ?></td>
+      <td><?= htmlspecialchars($m['OBSAH']) ?></td>
+      
       <td>
         <?php if (!$m['PRECTENO']): ?>
         <form method="post" action="actions/mark_read.php" style="display:inline">

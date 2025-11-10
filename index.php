@@ -1,18 +1,22 @@
-
+<?php
+require_once __DIR__ . '/config/session.php';
+require_once __DIR__ . '/config/db_connect.php';
+?>
 <!doctype html>
 <html lang="cs">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Online Hry IS – Přehled</title>
+  <title>Online Hry  – Přehled</title>
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
   <header class="nav">
-    <div class="brand">🎮 Online Hry IS</div>
+    <div class="brand"> Online Hry </div>
     <nav>
       <a href="index.php" aria-current="page">Domů</a>
       <a href="register.php">Registrace</a>
+
       <?php if (empty($_SESSION['user_id'])): ?>
         <a href="login.php">Přihlášení</a>
       <?php else: ?>
@@ -25,10 +29,36 @@
   </header>
 
   <main class="container">
+
     <section class="card">
-      <h1>Vítejte v Online Hry IS</h1>
-      <p class="lead">Přihlaste se a napište zprávu, nebo si prohlédněte doručené.</p>
+      <h1>Vítejte v Online Hry </h1>
+      <p class="lead">Vyberte hru a začněte hrát.</p>
     </section>
+
+    <!-- ✅ Výběr her -->
+    <section class="card">
+      <h2>Dostupné hry</h2>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:16px;">
+        <?php
+          $games = $conn->query("SELECT ID, NAZEV, POPIS FROM hra ORDER BY ID");
+          if ($games && $games->num_rows):
+            while ($g = $games->fetch_assoc()):
+        ?>
+          <div class="card" style="padding:16px;">
+            <h3><?= htmlspecialchars($g['NAZEV']) ?></h3>
+            <p><?= htmlspecialchars(substr($g['POPIS'], 0, 100)) ?>...</p>
+            <a href="play.php?game=<?= (int)$g['ID'] ?>" class="btn-primary" style="margin-top:10px;">Hrát</a>
+          </div>
+        <?php
+            endwhile;
+          else:
+            echo "<p>Žádné hry nejsou dostupné.</p>";
+          endif;
+        ?>
+      </div>
+    </section>
+
   </main>
 </body>
 </html>
