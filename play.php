@@ -10,7 +10,7 @@ if (empty($_SESSION['user_id'])) {
 $game_id = intval($_GET['game'] ?? 0);
 
 // Načtení hry z databáze
-$stmt = $conn->prepare("SELECT ID, NAZEV, POPIS, ZANR, OBTIZNOST FROM hra WHERE ID = ?");
+$stmt = $conn->prepare("SELECT ID, NAZEV, POPIS, ZANR, OBTIZNOST, ADRESA FROM hra WHERE ID = ?");
 $stmt->bind_param("i", $game_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -46,14 +46,14 @@ if (!$game) {
             <p><strong>Žánr:</strong> <?= htmlspecialchars($game['ZANR']) ?></p>
             <p><strong>Obtížnost:</strong> <?= htmlspecialchars($game['OBTIZNOST']) ?></p>
             <p><?= nl2br(htmlspecialchars($game['POPIS'])) ?></p>
-
             <hr>
 
+            <iframe id="hra" frameborder="0" height="600" width="100%" allow="autoplay" allowfullscreen="" seamless="" scrolling="no" 
+            src=<?=$game['ADRESA']?>></iframe>                    
             
-            <div id="game-area" style="position:relative;height:300px;border:2px solid #ccc;border-radius:8px;margin-top:20px;overflow:hidden;">
-  <button id="target" style="position:absolute;display:none;" class="btn-primary">Klikni!</button>
+  <!--<button id="target" style="position:absolute;display:none;" class="btn-primary">Klikni!</button>-->
 </div>
-
+<!--
 <p>Skóre: <span id="score">0</span></p>
 <button id="startBtn" class="btn-primary">Spustit hru</button>
 
@@ -120,6 +120,8 @@ startBtn.addEventListener("click", () => {
     }, 20000);
 });
 </script>
+
+-->
 
             
 

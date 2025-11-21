@@ -1,2 +1,4 @@
 2025-11-02T13:16:52+01:00 PING
 2025-11-02T13:16:52+01:00 DB=phpmyadmin POST={"csrf":"e1a225daa2dab727c423f13720fda43b8ff9e9f7afd592fea2f6cce775ddd196","first_name":"tur","last_name":"tur","email":"petynkat2@seznam.cz","phone":"+420 500 500 500","gender":"","login":"player01","password":"Hessex1000","password2":"Hessex1000"}
+2025-11-21T15:15:43+01:00 PING
+2025-11-21T15:15:43+01:00 DB=phpmyadmin POST={"csrf":"81b3daa7071c21f2fde52620abaa89224f686fd393da8814b796f085e9b3e484","first_name":"alex","last_name":"sdf","email":"sdfds@sdf.st","phone":"","gender":"","login":"MaVa","password":"Heslo12345","password2":"Heslo12345"}
