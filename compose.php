@@ -8,6 +8,8 @@ if (empty($_SESSION['user_id'])) { header('Location: /login.php'); exit; }
 $users = $conn->query("SELECT ID, UZIVATELSKE_JMENO FROM uzivatel ORDER BY UZIVATELSKE_JMENO");
 $csrf  = htmlspecialchars(ensure_csrf(), ENT_QUOTES, 'UTF-8');
 ?>
+<script src="assets/js/unread.js" defer></script>
+
 <!doctype html>
 <html lang="cs">
 <head>
@@ -20,14 +22,21 @@ $csrf  = htmlspecialchars(ensure_csrf(), ENT_QUOTES, 'UTF-8');
   <header class="nav">
     <div class="brand">🎮 Online Hry IS</div>
     <nav>
-      <a href="index.php">Domů</a>
-      <a href="register.php">Registrace</a>
-      <a href="login.php">Přihlášení</a>
-      <a href="inbox.php">Doručené</a>
-      <a href="sent.php">Odeslané</a>
-      <a href="compose.php" aria-current="page">Napsat</a>
-      <a href="actions/logout.php">Odhlásit</a>
-    </nav>
+  <a href="index.php">Domů</a>
+  <a href="register.php">Registrace</a>
+
+  <?php if (empty($_SESSION['user_id'])): ?>
+    <a href="login.php">Přihlášení</a>
+  <?php else: ?>
+    <a href="inbox.php">
+      Doručené (<span id="unreadCount">0</span>)
+    </a>
+    <a href="sent.php">Odeslané</a>
+    <a href="compose.php">Napsat</a>
+    <a href="actions/logout.php">Odhlásit</a>
+  <?php endif; ?>
+</nav>
+
   </header>
 
   <main class="page">

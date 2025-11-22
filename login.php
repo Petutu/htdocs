@@ -2,6 +2,8 @@
 require_once __DIR__.'/config/session.php';
 require_once __DIR__.'/config/security.php';
 ?>
+<script src="assets/js/unread.js" defer></script>
+
 <!doctype html>
 <html lang="cs">
 <head>

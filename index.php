@@ -2,6 +2,8 @@
 require_once __DIR__ . '/config/session.php';
 require_once __DIR__ . '/config/db_connect.php';
 ?>
+<script src="assets/js/unread.js" defer></script>
+
 <!doctype html>
 <html lang="cs">
 <head>
@@ -14,18 +16,21 @@ require_once __DIR__ . '/config/db_connect.php';
   <header class="nav">
     <div class="brand"> Online Hry </div>
     <nav>
-      <a href="index.php" aria-current="page">Domů</a>
-      <a href="register.php">Registrace</a>
+  <a href="index.php">Domů</a>
+  <a href="register.php">Registrace</a>
 
-      <?php if (empty($_SESSION['user_id'])): ?>
-        <a href="login.php">Přihlášení</a>
-      <?php else: ?>
-        <a href="inbox.php">Doručené</a>
-        <a href="sent.php">Odeslané</a>
-        <a href="compose.php">Napsat</a>
-        <a href="actions/logout.php">Odhlásit</a>
-      <?php endif; ?>
-    </nav>
+  <?php if (empty($_SESSION['user_id'])): ?>
+    <a href="login.php">Přihlášení</a>
+  <?php else: ?>
+    <a href="inbox.php">
+      Doručené (<span id="unreadCount">0</span>)
+    </a>
+    <a href="sent.php">Odeslané</a>
+    <a href="compose.php">Napsat</a>
+    <a href="actions/logout.php">Odhlásit</a>
+  <?php endif; ?>
+</nav>
+
   </header>
 
   <main class="container">

@@ -1,154 +1,189 @@
 <?php
-require_once __DIR__.'/config/session.php';
-require_once __DIR__.'/config/security.php';
+require_once __DIR__ . '/config/session.php';
+require_once __DIR__ . '/config/security.php';
 ?>
+<script src="assets/js/unread.js" defer></script>
+
 <!doctype html>
 <html lang="cs">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Registrace – Online Hry IS</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css" />
-  <!-- <script type="module" src="assets/js/validate.js"></script> -->
 </head>
 <body>
   <header class="nav">
     <div class="brand">🎮 Online Hry IS</div>
-    <nav>
-      <a href="index.php">Domů</a>
-      <a href="register.php" aria-current="page">Registrace</a>
-      <a href="login.php">Přihlášení</a>
-    </nav>
+   <nav>
+  <a href="index.php">Domů</a>
+  <a href="register.php">Registrace</a>
+
+  <?php if (empty($_SESSION['user_id'])): ?>
+    <a href="login.php">Přihlášení</a>
+  <?php else: ?>
+    <a href="inbox.php">
+      Doručené (<span id="unreadCount">0</span>)
+    </a>
+    <a href="sent.php">Odeslané</a>
+    <a href="compose.php">Napsat</a>
+    <a href="actions/logout.php">Odhlásit</a>
+  <?php endif; ?>
+</nav>
+
   </header>
 
   <main class="page">
     <div class="hero">
       <div class="hero-inner">
         <section class="card">
-          <h1>Vytvořit účet</h1>
-          <p class="lead">Zaregistrujte se a začněte sbírat skóre a odměny.</p>
+          <h1>Registrace</h1>
+          <p class="lead">Vytvořte si hráčský účet.</p>
 
-          <form method="post" action="/actions/register_action.php" enctype="multipart/form-data" id="registerForm" novalidate>
+          <form id="registerForm" method="post" action="/actions/register_action.php"
+                enctype="multipart/form-data" novalidate>
             <input type="hidden" name="csrf" value="<?= htmlspecialchars(ensure_csrf()) ?>">
 
-            <div class="field">
+            <!-- Jméno -->
+            <label class="field">
               <span class="field-label">Jméno</span>
               <div class="input-wrap">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 6v2h18v-2c0-3.5-4-6-9-6z"/></svg>
-                <input name="first_name" maxlength="50" placeholder="Alex" autocomplete="given-name" />
+                <input type="text" name="first_name" id="first_name"
+                       required minlength="2" maxlength="50" placeholder="Jan">
               </div>
-            </div>
+            </label>
 
-            <div class="field">
+            <!-- Příjmení -->
+            <label class="field">
               <span class="field-label">Příjmení</span>
               <div class="input-wrap">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 6v2h18v-2c0-3.5-4-6-9-6z"/></svg>
-                <input name="last_name" maxlength="50" placeholder="Nováková" autocomplete="family-name" />
+                <input type="text" name="last_name" id="last_name"
+                       required minlength="2" maxlength="50" placeholder="Novák">
               </div>
-            </div>
+            </label>
 
-            <div class="field">
+            <!-- Email -->
+            <label class="field">
               <span class="field-label">Email</span>
               <div class="input-wrap">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
-                <input type="email" name="email" maxlength="120" placeholder="alex@example.com" autocomplete="email" />
+                <input type="email" name="email" id="email"
+                       required maxlength="255" placeholder="jan.novak@example.com">
               </div>
-            </div>
+            </label>
 
-            <div class="field">
+            <!-- Telefon -->
+            <label class="field">
               <span class="field-label">Telefon</span>
               <div class="input-wrap">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.6 10.79a15.07 15.07 0 006.61 6.61l2.2-2.2a1 1 0 01.95-.27 11.36 11.36 0 003.56.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h2.5a1 1 0 011 1 11.36 11.36 0 00.57 3.56 1 1 0 01-.27.95l-2.2 2.28z"/></svg>
-                <input type="tel" name="phone" maxlength="20" pattern="\+?[0-9\s-]{7,20}" placeholder="+420 777 123 456" autocomplete="tel" />
+                <input type="tel" name="phone" id="phone"
+                       required pattern="^\+?[0-9 ]{9,20}$"
+                       placeholder="+420 777 123 456">
               </div>
-            </div>
+            </label>
 
-            <div class="field">
-              <span class="field-label">Pohlaví</span>
+            <!-- Pohlaví -->
+            <fieldset class="field">
+              <legend class="field-label">Pohlaví</legend>
               <div class="input-wrap">
-                <div class="custom-select" data-name="gender" aria-haspopup="listbox" tabindex="0" role="button" aria-expanded="false">
-                  <input type="hidden" name="gender" />
-                  <span class="select-trigger">Vyberte…</span>
-                  <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
-                  <ul class="select-options" role="listbox" aria-label="Pohlaví">
-                    <li data-value="male" aria-selected="true" class="opt">Muž</li>
-                    <li data-value="female" aria-selected="false" class="opt">Žena</li>
-                    <li data-value="other" aria-selected="false" class="opt">Jiné</li>
-                  </ul>
-                </div>
+                <label><input type="radio" name="gender" value="M" required> Muž</label>
+                <label><input type="radio" name="gender" value="F"> Žena</label>
+                <label><input type="radio" name="gender" value="O"> Jiné / neuvádět</label>
               </div>
-            </div>
+            </fieldset>
 
-            <hr style="border:none;height:1px;background:rgba(255,255,255,0.03);margin:16px 0">
+            <!-- Profilová fotografie -->
+            <label class="field">
+              <span class="field-label">Profilová fotografie</span>
+              <div class="input-wrap">
+                <input type="file" name="photo" id="photo"
+                       required accept="image/*">
+              </div>
+              <small>Musí být obrázek, bude převeden na JPEG 800×XXX, kvalita 90.</small>
+            </label>
 
-            <div class="field">
+            <!-- Login -->
+            <label class="field">
               <span class="field-label">Login</span>
               <div class="input-wrap">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 6v2h18v-2c0-3.5-4-6-9-6z"/></svg>
-                <input required name="login" pattern="[A-Za-z0-9_]{4,30}" placeholder="player01" autocomplete="username" />
+                <input type="text" name="login" id="login"
+                       required pattern="[A-Za-z0-9_]{4,30}"
+                       placeholder="player01" autocomplete="username">
               </div>
-            </div>
+            </label>
 
-            <div class="field">
+            <!-- Heslo -->
+            <label class="field">
               <span class="field-label">Heslo</span>
-              <div class="input-wrap" style="justify-content:space-between;gap:8px">
-                <div style="display:flex;align-items:center;gap:10px;flex:1">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 8V7a5 5 0 0 0-10 0v1H5v12h14V8h-2zM9 7a3 3 0 0 1 6 0v1H9V7zm3 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
-                  <input id="password" required type="password" name="password" minlength="10" placeholder="min. 10 znaků" autocomplete="new-password" />
-                </div>
-                <button type="button" class="btn-primary" id="pwToggle" style="padding:6px 10px;background:transparent;border:1px solid rgba(255,255,255,0.04);box-shadow:none;font-weight:600">Zobrazit</button>
+              <div class="input-wrap">
+                <input type="password" name="password" id="password"
+                       required minlength="10" autocomplete="new-password"
+                       placeholder="min. 10 znaků">
               </div>
-              <small class="hint" style="color:var(--muted);display:block;margin-top:8px">Heslo musí mít minimálně 10 znaků.</small>
-            </div>
+            </label>
 
-            <div class="field">
+            <!-- Heslo znovu -->
+            <label class="field">
               <span class="field-label">Heslo znovu</span>
               <div class="input-wrap">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 8V7a5 5 0 0 0-10 0v1H5v12h14V8h-2zM9 7a3 3 0 0 1 6 0v1H9V7zm3 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
-                <input id="password2" required type="password" name="password2" minlength="10" placeholder="potvrzení hesla" autocomplete="new-password" />
+                <input type="password" name="password2" id="password2"
+                       required minlength="10" autocomplete="new-password"
+                       placeholder="zopakujte heslo">
               </div>
-            </div>
+            </label>
 
-            <div class="field">
-              <span class="field-label">Profilová fotografie (JPEG/PNG/GIF/BMP)</span>
-              <div class="input-wrap file-wrap">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14h18zM8 7a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm1 8l2.5-3 3.5 4.5H9z"/></svg>
-                <label class="file-btn" for="photoInput">Vybrat soubor</label>
-                <span class="file-name">Soubor nevybrán</span>
-                <input id="photoInput" class="file-input" type="file" name="photo" accept="image/jpeg,image/png,image/gif,image/bmp" />
-                <button type="button" class="btn-clear" title="Odstranit soubor" aria-hidden="true">✕</button>
-                <div class="file-preview" aria-hidden="true"></div>
-              </div>
-            </div>
-
-            <div class="actions" style="margin-top:18px">
+            <div class="actions">
               <button class="btn-primary" type="submit">Registrovat</button>
-              <a class="link" href="login.php">Mám účet → Přihlášení</a>
+              <a class="link" href="login.php">Už mám účet → Přihlášení</a>
             </div>
           </form>
         </section>
-
-        <aside class="panel">
-          <h2>Proč se registrovat?</h2>
-          <ul>
-            <li>Ukládání skóre a pokroku</li>
-            <li>Speciální soutěže a odměny</li>
-            <li>Rychlé přihlášení a správa profilu</li>
-          </ul>
-          <a class="link" href="login.php" style="display:inline-block;margin-top:12px">Už mám účet</a>
-        </aside>
       </div>
     </div>
   </main>
 
   <script>
-    document.getElementById('pwToggle')?.addEventListener('click', function(){
-      const p = document.getElementById('password');
-      if(!p) return;
-      if(p.type === 'password'){ p.type = 'text'; this.textContent = 'Skrýt'; }
-      else { p.type = 'password'; this.textContent = 'Zobrazit'; }
-    });
+  // Jednoduchá JS validace na frontendu
+  document.getElementById('registerForm').addEventListener('submit', function (e) {
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const pass  = document.getElementById('password').value;
+    const pass2 = document.getElementById('password2').value;
+    const photo = document.getElementById('photo').files[0];
+
+    const errors = [];
+
+    // Email
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      errors.push('Zadejte platný email.');
+    }
+    // Telefon
+    if (!/^\+?[0-9 ]{9,20}$/.test(phone)) {
+      errors.push('Telefon musí mít 9–20 číslic (případně s + a mezerami).');
+    }
+    // Heslo
+    if (pass.length < 10) {
+      errors.push('Heslo musí mít alespoň 10 znaků.');
+    }
+    if (pass !== pass2) {
+      errors.push('Hesla se neshodují.');
+    }
+    // Foto
+    if (!photo) {
+      errors.push('Nahrajte profilovou fotografii.');
+    } else {
+      if (!photo.type.startsWith('image/')) {
+        errors.push('Soubor musí být obrázek.');
+      }
+      if (photo.size > 5 * 1024 * 1024) {
+        errors.push('Obrázek může mít maximálně 5 MB.');
+      }
+    }
+
+    if (errors.length > 0) {
+      e.preventDefault();
+      alert(errors.join('\n'));
+    }
+  });
   </script>
 </body>
 </html>

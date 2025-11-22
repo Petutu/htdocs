@@ -1,16 +1,37 @@
 <?php
-require_once __DIR__ . '/config/session.php';
-require_once __DIR__ . '/config/db_connect.php';
-if (empty($_SESSION['user_id'])) { header('Location: /login.php'); exit; }
+require_once __DIR__.'/config/session.php';
+require_once __DIR__.'/config/security.php';
+require_once __DIR__.'/config/db_connect.php';
+require_once __DIR__.'/config/crypto.php';
+
+
+if (empty($_SESSION['user_id'])) {
+    header('Location: /login.php');
+    exit;
+}
+
 $uid = (int)$_SESSION['user_id'];
 
-$stmt = $conn->prepare("SELECT u.UZIVATELSKE_JMENO AS recipient, z.PREDMET, z.DATUM
-  FROM zprava z JOIN uzivatel u ON u.ID = z.PRIJEMCE_ID
-  WHERE z.ODESILATEL_ID = ? ORDER BY z.DATUM DESC");
+// načteme odeslané zprávy – kde JÁ jsem odesílatel
+$stmt = $conn->prepare("
+    SELECT 
+        z.ID,
+        u.UZIVATELSKE_JMENO AS recipient,
+        z.PREDMET,
+        z.OBSAH,
+        z.DATUM,
+        z.PRECTENO
+    FROM zprava z
+    JOIN uzivatel u ON u.ID = z.PRIJEMCE_ID
+    WHERE z.ODESILATEL_ID = ?
+    ORDER BY z.DATUM DESC
+");
 $stmt->bind_param('i', $uid);
 $stmt->execute();
-$res = $stmt->get_result();
+$items = $stmt->get_result();
 ?>
+<script src="assets/js/unread.js" defer></script>
+
 <!doctype html>
 <html lang="cs">
 <head>
@@ -20,47 +41,60 @@ $res = $stmt->get_result();
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
-  <header class="nav">
-    <div class="brand">🎮 Online Hry IS</div>
-    <nav>
-      <a href="index.php">Domů</a>
-      <a href="register.php">Registrace</a>
-      <a href="login.php">Přihlášení</a>
-      <a href="inbox.php">Doručené</a>
-      <a href="sent.php" aria-current="page">Odeslané</a>
-      <a href="compose.php">Napsat</a>
-      <a href="actions/logout.php">Odhlásit</a>
-    </nav>
-  </header>
+<header class="nav">
+  <div class="brand">🎮 Online Hry IS</div>
+ <nav>
+  <a href="index.php">Domů</a>
+  <a href="register.php">Registrace</a>
 
-  <main class="page">
-    <div class="hero">
-      <div class="hero-inner">
-        <section class="card">
-          <h1>Odeslané zprávy</h1>
-          <div class="table-wrapper">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Komu</th>
-                  <th>Předmět</th>
-                  <th>Datum</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php while($m = $res->fetch_assoc()): ?>
-                <tr>
-                  <td><?php echo htmlspecialchars($m['recipient']); ?></td>
-                  <td><?php echo htmlspecialchars($m['PREDMET']); ?></td>
-                  <td><?php echo htmlspecialchars($m['DATUM']); ?></td>
-                </tr>
-                <?php endwhile; ?>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
+  <?php if (empty($_SESSION['user_id'])): ?>
+    <a href="login.php">Přihlášení</a>
+  <?php else: ?>
+    <a href="inbox.php">
+      Doručené (<span id="unreadCount">0</span>)
+    </a>
+    <a href="sent.php">Odeslané</a>
+    <a href="compose.php">Napsat</a>
+    <a href="actions/logout.php">Odhlásit</a>
+  <?php endif; ?>
+</nav>
+
+</header>
+
+<main class="container">
+  <section class="card">
+    <h1>Odeslané zprávy</h1>
+
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Komu</th>
+            <th>Předmět</th>
+            <th>Datum</th>
+            <th>Stav u příjemce</th>
+            <th>Obsah</th>
+          </tr>
+        </thead>
+        <tbody>
+        <?php while ($m = $items->fetch_assoc()): ?>
+          <?php
+            // 🔓 dešifrování šifrovaných polí
+            $subject = decrypt_field($m['PREDMET']);
+            $body    = decrypt_field($m['OBSAH']);
+          ?>
+          <tr class="<?= $m['PRECTENO'] ? '' : 'row-unread' ?>">
+            <td><?= htmlspecialchars($m['recipient']) ?></td>
+            <td><?= htmlspecialchars($subject) ?></td>
+            <td><?= htmlspecialchars($m['DATUM']) ?></td>
+            <td><?= $m['PRECTENO'] ? 'přečteno' : 'nepřečteno' ?></td>
+            <td><?= nl2br(htmlspecialchars($body)) ?></td>
+          </tr>
+        <?php endwhile; ?>
+        </tbody>
+      </table>
     </div>
-  </main>
+  </section>
+</main>
 </body>
 </html>
