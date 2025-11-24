@@ -1,7 +1,7 @@
 <?php
 
 const CRYPTO_CIPHER = 'AES-256-CBC';
-const CRYPTO_KEY    = 'change_this_to_32_bytes_secret_key!'; // 32 znaků
+const CRYPTO_KEY    = 'ASFBDR7725222221111141444'; // 32 znaků
 const CRYPTO_IV_LEN = 16;
 
 function encrypt_field(string $plain): string {
