@@ -16,11 +16,24 @@ require_once __DIR__.'/config/security.php';
 <body>
   <header class="nav">
     <div class="brand">🎮 Online Hry IS</div>
-    <nav>
-      <a href="index.php">Domů</a>
+   <nav>
+  <a href="index.php">Domů</a>
+
+  <?php if (empty($_SESSION['user_id'])): ?>
+      <!-- Uživatel není přihlášen → zobrazit Registraci a Přihlášení -->
       <a href="register.php">Registrace</a>
-      <a href="login.php" aria-current="page">Přihlášení</a>
-    </nav>
+      <a href="login.php">Přihlášení</a>
+  <?php else: ?>
+      <!-- Uživatel je přihlášen → zobrazit zprávy + odhlášení -->
+      <a href="inbox.php">
+        Doručené (<span id="unreadCount">0</span>)
+      </a>
+      <a href="sent.php">Odeslané</a>
+      <a href="compose.php">Napsat</a>
+      <a href="profile.php">Profil</a>
+      <a href="actions/logout.php">Odhlásit</a>
+  <?php endif; ?>
+</nav>
   </header>
 
   <main class="page">
