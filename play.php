@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/config/session.php';
 require_once __DIR__ . '/config/db_connect.php';
+require_once __DIR__ . '/config/security.php';
 
 if (empty($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -19,35 +20,51 @@ $game = $result->fetch_assoc();
 if (!$game) {
     die("Hra nebyla nalezena.");
 }
-?>
-<script src="assets/js/unread.js" defer></script>
 
+// Načtení komentářů k dané hře
+$commentStmt = $conn->prepare("
+    SELECT 
+        u.UZIVATELSKE_JMENO,
+        kom.KOMENTAR,
+        kom.CAS_VLOZENI
+    FROM komentar kom
+    JOIN uzivatel u ON u.ID = kom.ID_UZIVATELE
+    WHERE kom.ID_HRY = ?
+    ORDER BY kom.CAS_VLOZENI DESC
+    LIMIT 10
+");
+$commentStmt->bind_param("i", $game_id);
+$commentStmt->execute();
+$comments = $commentStmt->get_result();
+
+$csrf = ensure_csrf();
+?>
 <!doctype html>
 <html lang="cs">
 <head>
     <meta charset="utf-8">
     <title><?= htmlspecialchars($game['NAZEV']) ?> – Hra</title>
     <link rel="stylesheet" href="assets/css/styles.css">
+    <script src="assets/js/unread.js" defer></script>
 </head>
 <body>
 <header class="nav">
     <div class="brand">🎮 Online Hry IS</div>
-   <nav>
-  <a href="index.php">Domů</a>
-  <a href="register.php">Registrace</a>
+    <nav>
+      <a href="index.php">Domů</a>
+      <a href="register.php">Registrace</a>
 
-  <?php if (empty($_SESSION['user_id'])): ?>
-    <a href="login.php">Přihlášení</a>
-  <?php else: ?>
-    <a href="inbox.php">
-      Doručené (<span id="unreadCount">0</span>)
-    </a>
-    <a href="sent.php">Odeslané</a>
-    <a href="compose.php">Napsat</a>
-    <a href="actions/logout.php">Odhlásit</a>
-  <?php endif; ?>
-</nav>
-
+      <?php if (empty($_SESSION['user_id'])): ?>
+        <a href="login.php">Přihlášení</a>
+      <?php else: ?>
+        <a href="inbox.php">
+          Doručené (<span id="unreadCount">0</span>)
+        </a>
+        <a href="sent.php">Odeslané</a>
+        <a href="compose.php">Napsat</a>
+        <a href="actions/logout.php">Odhlásit</a>
+      <?php endif; ?>
+    </nav>
 </header>
 
 <main class="page">
@@ -59,105 +76,52 @@ if (!$game) {
             <p><?= nl2br(htmlspecialchars($game['POPIS'])) ?></p>
             <hr>
 
-            <iframe id="hra" frameborder="0" height="600" width="100%" allow="autoplay" allowfullscreen="" seamless="" scrolling="no" 
-            src=<?=$game['ADRESA']?>></iframe>                    
-            
-  <!--<button id="target" style="position:absolute;display:none;" class="btn-primary">Klikni!</button>-->
-</div>
-<!--
-<p>Skóre: <span id="score">0</span></p>
-<button id="startBtn" class="btn-primary">Spustit hru</button>
+            <iframe
+                id="hra"
+                frameborder="0"
+                height="600"
+                width="100%"
+                allow="autoplay"
+                allowfullscreen
+                seamless
+                scrolling="no"
+                src="<?= htmlspecialchars($game['ADRESA']) ?>"></iframe>
 
-<script>
-let score = 0;
-let active = false;
+            <hr>
+            <h2>Komentáře</h2>
 
-const gameArea = document.getElementById("game-area");
-const target = document.getElementById("target");
-const scoreEl = document.getElementById("score");
-const startBtn = document.getElementById("startBtn");
+            <!-- Formulář pro nový komentář -->
+            <form method="post" action="actions/comment_add.php" class="comment-form">
+                <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf) ?>">
+                <input type="hidden" name="game_id" value="<?= (int)$game_id ?>">
 
-function randomPosition() {
-    const areaWidth = gameArea.clientWidth;
-    const areaHeight = gameArea.clientHeight;
+                <label class="field">
+                    <span class="field-label">Váš komentář</span>
+                    <textarea name="comment" rows="4" required
+                              placeholder="Napište, jak se vám hra líbí..."></textarea>
+                </label>
 
-    const x = Math.random() * (areaWidth - 80);
-    const y = Math.random() * (areaHeight - 40);
+                <button type="submit" class="btn-primary">Odeslat komentář</button>
+            </form>
 
-    target.style.left = x + "px";
-    target.style.top = y + "px";
-}
+            <!-- Výpis posledních komentářů -->
+            <?php if ($comments->num_rows > 0): ?>
+                <ol class="comment-list">
+                    <?php while ($row = $comments->fetch_assoc()): ?>
+                        <li>
+                            <strong><?= htmlspecialchars($row['UZIVATELSKE_JMENO']) ?></strong>
+                            <small>
+                                (<?= htmlspecialchars($row['CAS_VLOZENI']) ?>)
+                            </small>
+                            <br>
+                            <?= nl2br(htmlspecialchars($row['KOMENTAR'])) ?>
+                        </li>
+                    <?php endwhile; ?>
+                </ol>
+            <?php else: ?>
+                <p>Zatím tu nejsou žádné komentáře. Buďte první 😊</p>
+            <?php endif; ?>
 
-function spawnTarget() {
-    if (!active) return;
-
-    target.style.display = "block";
-    randomPosition();
-
-    setTimeout(spawnTarget, 900 - score * 10); // čím víc skóre, tím rychleji
-}
-
-target.addEventListener("click", () => {
-    score++;
-    scoreEl.textContent = score;
-    randomPosition();
-});
-
-startBtn.addEventListener("click", () => {
-    score = 0;
-    scoreEl.textContent = score;
-    active = true;
-    spawnTarget();
-
-    startBtn.disabled = true;
-
-    // konec hry po 20 sekundách
-    setTimeout(() => {
-        active = false;
-        target.style.display = "none";
-        startBtn.disabled = false;
-
-        alert("Konec hry! Skóre: " + score);
-
-        // API hook – zde je možné odeslat skóre do PHP
-        fetch("/actions/save_score.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                game_id: <?= (int)$game_id ?>,
-                score: score
-            })
-        });
-    }, 20000);
-});
-</script>
-
--->
-
-            
-
-           
-
-            <h2>Žebříček</h2>
-            <?php
-            $scoreStmt = $conn->prepare("
-                SELECT u.UZIVATELSKE_JMENO, hscore.SKORE 
-                FROM highscore hscore
-                JOIN uzivatel u ON u.ID = hscore.ID_UZIVATEL
-                WHERE hscore.ID_HRA = ?
-                ORDER BY hscore.SKORE DESC
-                LIMIT 10
-            ");
-            $scoreStmt->bind_param("i", $game_id);
-            $scoreStmt->execute();
-            $scores = $scoreStmt->get_result();
-            ?>
-
-            <ol>
-            <?php while ($row = $scores->fetch_assoc()): ?>
-                <li><strong><?= htmlspecialchars($row['UZIVATELSKE_JMENO']) ?></strong> – <?= $row['SKORE'] ?></li>
-            <?php endwhile; ?>
-            </ol>
         </div>
     </div>
 </main>
