@@ -17,7 +17,8 @@ require_once __DIR__.'/../config/security.php';
       grid-template-areas: 
         "header header header"
         "battle puzzle weekly"
-        "stats stats sidebar";
+        "stats stats stats"
+        "sidebar sidebar sidebar";
       grid-template-columns: 1fr 1fr 1fr;  /* Rovnoměrné rozdělení */
       gap: 24px;  /* Větší mezery */
       padding: 24px;
@@ -104,12 +105,12 @@ require_once __DIR__.'/../config/security.php';
     </header>
 
     <section class="card game-card" id="game-battle">
-      <h2>Battle Arena</h2>
+      <h1>Battle Arena</h1>
       <div class="game-content">
         <p>Rychlé zápasy 1v1 s průměrnou délkou 8 minut</p>
-        <div class="game-stats">
+        <div class="game-tags">
+          <span>PvP</span>
           <span>1v1</span>
-          <span>⏱8min</span>
           <span>Ranked</span>
         </div>
         <a href="play.html?game=battle" class="btn-primary">Hrát</a>
@@ -120,20 +121,20 @@ require_once __DIR__.'/../config/security.php';
       <h1>Puzzle Quest</h1>
       <div class="game-content">
         <p>Kooperativní logické hry pro všechny věkové skupiny</p>
-        <div class="game-stats">
-          <span>Co-op</span>
-          <span>15min</span>
-          <span>4.8/5</span>
+        <div class="game-tags">
+          <span>Single Player</span>
+          <span>PG3</span>
+          <span>Logické</span>
         </div>
         <a href="play.html?game=puzzle" class="btn-primary">Hrát</a>
       </div>
     </section>
 
     <section class="card game-card" id="game-weekly">
-      <h2>Týdenní výzva</h2>
+      <h1>Týdenní výzva</h1>
       <div class="game-content">
         <p>Speciální výzvy s extra odměnami</p>
-        <div class="game-stats">
+        <div class="game-tags">
           <span>7 dní</span>
           <span>3 úkoly</span>
           <span>2x body</span>
@@ -142,33 +143,50 @@ require_once __DIR__.'/../config/security.php';
       </div>
     </section>
 
-    <section class="card stats-area">
-      <h2>Statistiky serveru</h2>
+    <section class="stats-area">
+      <h2 class="stats-heading">Statistiky serveru</h2>
+      
       <div class="stats-grid">
-        <div class="stat-box">
-          <h3>Online hráči</h3>
-          <p class="stat-value">1,245</p>
+        
+        <div class="stat-card">
+          <p class="stat-label">Online hráči</p>
+          <h1 class="stat-value">1,245</h1>
         </div>
-        <div class="stat-box">
-          <h3>Dnešní zápasy</h3>
-          <p class="stat-value">8,392</p>
+        
+        <div class="stat-card">
+          <p class="stat-label">Dnešní zápasy</p>
+          <h1 class="stat-value">8,392</h1>
         </div>
-        <div class="stat-box">
-          <h3>Aktivní turnaje</h3>
-          <p class="stat-value">3</p>
+        
+        <div class="stat-card">
+          <p class="stat-label">Počet her</p>
+          <h1 class="stat-value">3</h1>
         </div>
+        
       </div>
     </section>
 
-    <aside class="card sidebar">
-      <h2>Žebříček celkových bodů</h2>
-      <ol class="leaderboard">
-        <li><strong>player01</strong><span>: 2,420</span></li>
-        <li><strong>gamerX</strong><span>: 1,980</span></li>
-        <li><strong>alice</strong><span>: 1,540</span></li>
-        <li><strong>proGamer</strong><span>: 870</span></li>
-        <li><strong>noobMaster</strong><span>: 230</span></li>
-      </ol>
+    <aside class="card sidebar comment-section">
+      <h2>Komentáře</h2>
+      
+      <form class="comment-form">
+        <textarea placeholder="Napište svůj komentář..." class="comment-input"></textarea>
+        <button type="submit" class="btn-primary btn-small">Odeslat</button>
+      </form>
+
+      <div class="comment-list">
+        <div class="comment-item">
+          <p class="comment-author"><strong>player01</strong> <span>před 5 minuty</span></p>
+          <p class="comment-text">Super update! Battle Arena je teď skvěle vyvážená.</p>
+        </div>
+        
+        <div class="comment-item">
+          <p class="comment-author"><strong>gamerX</strong> <span>před 1 hodinou</span></p>
+          <p class="comment-text">Těším se na týdenní výzvu. Budou tentokrát i speciální odměny pro Puzzle Quest?</p>
+        </div>
+
+        </div>
+    </aside>
   </main>
 
   <script type="module">
