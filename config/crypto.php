@@ -1,12 +1,12 @@
 <?php
 
 const CRYPTO_CIPHER = 'AES-256-CBC';
-const CRYPTO_KEY    = 'ASFBDR7725222221111141444'; // 32 znaků
+const CRYPTO_KEY    = 'ASFBDR7725222221111141444'; 
 const CRYPTO_IV_LEN = 16;
 
 function encrypt_field(string $plain): string {
     if ($plain === '') return '';
-    $iv = random_bytes(CRYPTO_IV_LEN);
+    $iv = random_bytes(CRYPTO_IV_LEN); 
     $cipher = openssl_encrypt($plain, CRYPTO_CIPHER, CRYPTO_KEY, OPENSSL_RAW_DATA, $iv);
     return base64_encode($iv . $cipher);
 }

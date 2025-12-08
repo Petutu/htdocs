@@ -24,7 +24,7 @@ if ($comment === '') {
     exit('Komentář nesmí být prázdný.');
 }
 
-// volitelně: zkrátit maximální délku
+//maximalni delka komentare
 if (mb_strlen($comment) > 1000) {
     $comment = mb_substr($comment, 0, 1000);
 }

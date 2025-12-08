@@ -33,7 +33,7 @@ if ($check->get_result()->num_rows === 0) {
     exit('Zadaný příjemce neexistuje.');
 }
 
-// 🔐 šifrování před uložením
+//  šifrování před uložením
 $subjectEnc = encrypt_field($subject);
 $bodyEnc    = encrypt_field($body);
 

@@ -10,8 +10,15 @@ function ensure_csrf(): string {
 }
 
 function verify_csrf(): void {
-  $sent = $_POST['csrf'] ?? '';
-  if (!hash_equals($_SESSION['csrf_token'] ?? '', $sent)) {
+  // CSRF kontrolujeme jen u POST požadavků
+  if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    return;
+  }
+
+  $sent  = $_POST['csrf'] ?? '';
+  $valid = $_SESSION['csrf_token'] ?? '';
+
+  if ($sent === '' || $valid === '' || !hash_equals($valid, $sent)) {
     http_response_code(419); // Authentication Timeout
     exit('CSRF token nesouhlasí.');
   }

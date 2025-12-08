@@ -48,27 +48,44 @@ $csrf = ensure_csrf();
     <script src="assets/js/unread.js" defer></script>
 </head>
 <body>
-<header class="nav">
-    <div class="brand">🎮 Online Hry IS</div>
-   <nav>
-  <a href="index.php">Domů</a>
 
-  <?php if (empty($_SESSION['user_id'])): ?>
-      <!-- Uživatel není přihlášen → zobrazit Registraci a Přihlášení -->
-      <a href="register.php">Registrace</a>
-      <a href="login.php">Přihlášení</a>
-  <?php else: ?>
-      <!-- Uživatel je přihlášen → zobrazit zprávy + odhlášení -->
-      <a href="inbox.php">
-        Doručené (<span id="unreadCount">0</span>)
-      </a>
-      <a href="sent.php">Odeslané</a>
-      <a href="compose.php">Napsat</a>
-      <a href="profile.php">Profil</a>
-      <a href="actions/logout.php">Odhlásit</a>
-  <?php endif; ?>
-</nav>
+<?php
+$isAdmin = false;
+
+if (!empty($_SESSION['user_id'])) {
+    $uid = (int)$_SESSION['user_id'];
+    $stmt = $conn->prepare("SELECT JEADMIN FROM uzivatel WHERE ID=?");
+    $stmt->bind_param("i", $uid);
+    $stmt->execute();
+    $isAdmin = $stmt->get_result()->fetch_assoc()['JEADMIN'] == 1;
+}
+?>
+
+<header class="nav">
+    <div class="brand"> Online Hry IS</div>
+   <nav>
+      <a href="index.php">Domů</a>
+
+      <?php if (empty($_SESSION['user_id'])): ?>
+          <a href="register.php">Registrace</a>
+          <a href="login.php">Přihlášení</a>
+      <?php else: ?>
+          <a href="inbox.php">
+            Doručené (<span id="unreadCount">0</span>)
+          </a>
+          <a href="sent.php">Odeslané</a>
+          <a href="compose.php">Napsat</a>
+          <a href="profile.php">Profil</a>
+
+          <?php if ($isAdmin): ?>
+              <a href="admin_users.php" class="admin-link">Admin</a>
+          <?php endif; ?>
+
+          <a href="actions/logout.php">Odhlásit</a>
+      <?php endif; ?>
+   </nav>
 </header>
+
 
 <main class="page">
     <div class="hero">

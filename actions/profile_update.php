@@ -1,4 +1,5 @@
 <?php
+// actions/profile_update.php
 require_once __DIR__ . '/../config/session.php';
 require_once __DIR__ . '/../config/db_connect.php';
 require_once __DIR__ . '/../config/security.php';
@@ -7,88 +8,185 @@ require_once __DIR__ . '/../config/crypto.php';
 verify_csrf();
 
 if (empty($_SESSION['user_id'])) {
-    header("Location: /login.php");
+    header('Location: /login.php');
     exit;
 }
 
 $currentUserId = (int)$_SESSION['user_id'];
-$editId = (int)($_POST['id'] ?? 0);
-
+$editId        = (int)($_POST['id'] ?? 0);
 if ($editId <= 0) {
-    exit("Neplatné ID.");
+    exit('Neplatné ID uživatele.');
 }
 
-// zjistíme, zda je aktuální uživatel admin
-$stmt = $conn->prepare("SELECT JEADMIN FROM uzivatel WHERE ID = ?");
-$stmt->bind_param("i", $currentUserId);
+/* zjištění, zda je aktuální uživatel admin */
+$stmt = $conn->prepare('SELECT JEADMIN FROM uzivatel WHERE ID = ?');
+$stmt->bind_param('i', $currentUserId);
 $stmt->execute();
-$isAdmin = $stmt->get_result()->fetch_assoc()['JEADMIN'] == 1;
+$row = $stmt->get_result()->fetch_assoc();
+$isAdmin = $row && (int)$row['JEADMIN'] === 1;
 
-// neadmin nesmí upravovat jiné osoby
+/* ne-admin nesmí editovat cizí účet */
 if (!$isAdmin && $editId !== $currentUserId) {
-    exit("Nemáte oprávnění upravovat tento účet.");
+    header('HTTP/1.1 403 Forbidden');
+    exit('Nemáte oprávnění upravovat cizí účet.');
 }
 
-// načtení hodnot z formuláře
-$first  = trim($_POST['first_name'] ?? '');
-$last   = trim($_POST['last_name'] ?? '');
-$email  = trim($_POST['email'] ?? '');
-$phone  = trim($_POST['phone'] ?? '');
-$gender = $_POST['gender'] ?? '';
-$role   = $isAdmin ? (int)($_POST['role'] ?? 0) : null;
+/* načtení aktuálních dat uživatele */
+$stmt = $conn->prepare('
+    SELECT JMENO, PRIJMENI, EMAIL, TELEFON, POHLAVI, JEADMIN, OBRAZEK
+      FROM uzivatel
+     WHERE ID = ?
+');
+$stmt->bind_param('i', $editId);
+$stmt->execute();
+$u = $stmt->get_result()->fetch_assoc();
 
-// validace
-if ($first === '' || $last === '' ||
-    !filter_var($email, FILTER_VALIDATE_EMAIL) ||
-    !preg_match('/^\+?[0-9 ]{9,20}$/', $phone) ||
-    !in_array($gender, ['M','F','O'], true)) {
-    exit("Neplatné vstupní údaje.");
+if (!$u) {
+    exit('Uživatel nenalezen.');
 }
 
-$emailEnc = encrypt_field($email);
-$phoneEnc = encrypt_field($phone);
+/* rozbalíme aktuální hodnoty */
+$first     = $u['JMENO'];
+$last      = $u['PRIJMENI'];
+$emailEnc  = $u['EMAIL'];
+$phoneEnc  = $u['TELEFON'];
+$gender    = $u['POHLAVI'];
+$role      = (int)$u['JEADMIN'];
 
-// zpracování obrázku (pokud je nahrán)
+/* které pole se má měnit? */
+$updateFirst  = array_key_exists('first_name', $_POST);
+$updateLast   = array_key_exists('last_name', $_POST);
+$updateEmail  = array_key_exists('email', $_POST);
+$updatePhone  = array_key_exists('phone', $_POST);
+$updateGender = array_key_exists('gender', $_POST);
+$updateRole   = $isAdmin && array_key_exists('role', $_POST);
+
+/* Jméno */
+if ($updateFirst) {
+    $newFirst = trim($_POST['first_name']);
+    if ($newFirst === '') {
+        exit('Jméno a příjmení jsou povinné.');
+    }
+    $first = $newFirst;
+}
+
+/* Příjmení */
+if ($updateLast) {
+    $newLast = trim($_POST['last_name']);
+    if ($newLast === '') {
+        exit('Jméno a příjmení jsou povinné.');
+    }
+    $last = $newLast;
+}
+
+/* Email */
+if ($updateEmail) {
+    $emailPlain = trim($_POST['email'] ?? '');
+    if (!filter_var($emailPlain, FILTER_VALIDATE_EMAIL)) {
+        exit('Neplatný email.');
+    }
+    $emailEnc = encrypt_field($emailPlain);
+}
+
+/* Telefon */
+if ($updatePhone) {
+    $phonePlain = trim($_POST['phone'] ?? '');
+    if (!preg_match('/^\+?[0-9 ]{9,20}$/', $phonePlain)) {
+        exit('Telefon musí mít 9–20 číslic (případně s + a mezerami).');
+    }
+    $phoneEnc = encrypt_field($phonePlain);
+}
+
+/* Pohlaví */
+if ($updateGender) {
+    $g = $_POST['gender'] ?? '';
+    if (!in_array($g, ['M', 'F', 'O'], true)) {
+        exit('Neplatná hodnota pohlaví.');
+    }
+    $gender = $g;
+}
+
+/* Role – jen admin */
+if ($updateRole) {
+    $role = (int)$_POST['role'];
+}
+
+/* zpracování nové fotky – volitelné */
 $photoData = null;
 
-if (!empty($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-    $imgInfo = @getimagesize($_FILES['photo']['tmp_name']);
-    if ($imgInfo === false) {
-        exit("Soubor není platný obrázek.");
+if (!empty($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE) {
+
+    if ($_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
+        exit('Chyba při nahrávání obrázku.');
     }
 
-    list($w, $h) = $imgInfo;
-    $src = imagecreatefromstring(file_get_contents($_FILES['photo']['tmp_name']));
-    if (!$src) exit("Chyba při zpracování obrázku.");
+    if (!function_exists('imagecreatefromstring')) {
+        exit('Na serveru není povolené rozšíření GD pro práci s obrázky.');
+    }
 
-    $newW = 800;
-    $newH = (int)round($h * ($newW / $w));
+    $tmp = $_FILES['photo']['tmp_name'];
 
-    $dst = imagecreatetruecolor($newW, $newH);
-    imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $w, $h);
+    // ověření, že jde o obrázek
+    $imgInfo = @getimagesize($tmp);
+    if ($imgInfo === false) {
+        exit('Soubor není platný obrázek.');
+    }
+
+    $mime = $imgInfo['mime'] ?? '';
+    $allowed = [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/bmp',
+        'image/x-ms-bmp',
+        'image/tiff',
+        'image/x-tiff'
+    ];
+    if (!in_array($mime, $allowed, true)) {
+        exit('Povolené formáty jsou JPEG, PNG, GIF, BMP a TIFF.');
+    }
+
+    list($width, $height) = $imgInfo;
+
+    if ($width <= 0 || $height <= 0) {
+        exit('Neplatné rozlišení obrázku.');
+    }
+
+    if ($width < 800) {
+        exit('Obrázek musí mít šířku alespoň 800 px.');
+    }
+
+    // načtení libovolného podporovaného formátu a převod na JPEG 800×XXX
+    $srcImg = imagecreatefromstring(file_get_contents($tmp));
+    if (!$srcImg) {
+        exit('Obrázek se nepodařilo načíst.');
+    }
+
+    $newWidth  = 800;
+    $newHeight = (int)round($height * ($newWidth / $width));
+
+    $dstImg = imagecreatetruecolor($newWidth, $newHeight);
+    imagecopyresampled($dstImg, $srcImg, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
 
     ob_start();
-    imagejpeg($dst, null, 90);
+    imagejpeg($dstImg, null, 90);        // JPEG, kvalita 90
     $photoData = ob_get_clean();
 
-    imagedestroy($src);
-    imagedestroy($dst);
+    imagedestroy($srcImg);
+    imagedestroy($dstImg);
 }
 
-// 🔧 build UPDATE dotazu podle toho, jestli je admin a jestli je nový obrázek
+/* UPDATE podle toho, zda je nová fotka a zda je admin */
 
 if ($photoData !== null) {
-    // máme novou fotku
     if ($isAdmin) {
-        // admin může měnit i roli
-        $stmt = $conn->prepare("
+        $stmt = $conn->prepare('
             UPDATE uzivatel
-            SET JMENO = ?, PRIJMENI = ?, EMAIL = ?, TELEFON = ?, POHLAVI = ?, JEADMIN = ?, OBRAZEK = ?
-            WHERE ID = ?
-        ");
-        // JMENO, PRIJMENI, EMAIL, TELEFON, POHLAVI, JEADMIN, OBRAZEK, ID
+               SET JMENO = ?, PRIJMENI = ?, EMAIL = ?, TELEFON = ?, POHLAVI = ?, JEADMIN = ?, OBRAZEK = ?
+             WHERE ID = ?
+        ');
         $stmt->bind_param(
-            "sssssi bi",
+            'sssssibi',
             $first,
             $last,
             $emailEnc,
@@ -98,18 +196,15 @@ if ($photoData !== null) {
             $photoData,
             $editId
         );
-        // poslat BLOB
-        $stmt->send_long_data(6, $photoData); // index 6 = 7. parametr (OBRAZEK)
+        $stmt->send_long_data(6, $photoData);
     } else {
-        // běžný uživatel – nemění roli
-        $stmt = $conn->prepare("
+        $stmt = $conn->prepare('
             UPDATE uzivatel
-            SET JMENO = ?, PRIJMENI = ?, EMAIL = ?, TELEFON = ?, POHLAVI = ?, OBRAZEK = ?
-            WHERE ID = ?
-        ");
-        // JMENO, PRIJMENI, EMAIL, TELEFON, POHLAVI, OBRAZEK, ID
+               SET JMENO = ?, PRIJMENI = ?, EMAIL = ?, TELEFON = ?, POHLAVI = ?, OBRAZEK = ?
+             WHERE ID = ?
+        ');
         $stmt->bind_param(
-            "sssssbi",
+            'sssssbi',
             $first,
             $last,
             $emailEnc,
@@ -118,19 +213,17 @@ if ($photoData !== null) {
             $photoData,
             $editId
         );
-        $stmt->send_long_data(5, $photoData); // index 5 = OBRAZEK
+        $stmt->send_long_data(5, $photoData);
     }
 } else {
-    // bez nové fotky
     if ($isAdmin) {
-        $stmt = $conn->prepare("
+        $stmt = $conn->prepare('
             UPDATE uzivatel
-            SET JMENO = ?, PRIJMENI = ?, EMAIL = ?, TELEFON = ?, POHLAVI = ?, JEADMIN = ?
-            WHERE ID = ?
-        ");
-        // JMENO, PRIJMENI, EMAIL, TELEFON, POHLAVI, JEADMIN, ID
+               SET JMENO = ?, PRIJMENI = ?, EMAIL = ?, TELEFON = ?, POHLAVI = ?, JEADMIN = ?
+             WHERE ID = ?
+        ');
         $stmt->bind_param(
-            "sssssii",
+            'sssssii',
             $first,
             $last,
             $emailEnc,
@@ -140,14 +233,13 @@ if ($photoData !== null) {
             $editId
         );
     } else {
-        $stmt = $conn->prepare("
+        $stmt = $conn->prepare('
             UPDATE uzivatel
-            SET JMENO = ?, PRIJMENI = ?, EMAIL = ?, TELEFON = ?, POHLAVI = ?
-            WHERE ID = ?
-        ");
-        // JMENO, PRIJMENI, EMAIL, TELEFON, POHLAVI, ID
+               SET JMENO = ?, PRIJMENI = ?, EMAIL = ?, TELEFON = ?, POHLAVI = ?
+             WHERE ID = ?
+        ');
         $stmt->bind_param(
-            "sssssi",
+            'sssssi',
             $first,
             $last,
             $emailEnc,
@@ -160,5 +252,5 @@ if ($photoData !== null) {
 
 $stmt->execute();
 
-header("Location: /profile.php?id=" . $editId);
+header('Location: /profile.php?id=' . $editId);
 exit;
