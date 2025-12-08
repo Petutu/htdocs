@@ -46,6 +46,27 @@ $csrf = ensure_csrf();
     <title><?= htmlspecialchars($game['NAZEV']) ?> – Hra</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <script src="assets/js/unread.js" defer></script>
+    <style>
+      .game-wrapper {
+        position: relative;
+      }
+      .fullscreen-btn {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        z-index: 10;
+      }
+      .game-fullscreen {
+        width: 100%;
+        height: 100%;
+      }
+      /* když je kontejner v režimu fullscreen, iframe vyplní celou obrazovku */
+      :fullscreen .game-frame {
+        width: 100vw;
+        height: 100vh;
+        border: none;
+      }
+    </style>
 </head>
 <body>
 
@@ -96,16 +117,24 @@ if (!empty($_SESSION['user_id'])) {
             <p><?= nl2br(htmlspecialchars($game['POPIS'])) ?></p>
             <hr>
 
-            <iframe
-                id="hra"
-                frameborder="0"
-                height="600"
-                width="100%"
-                allow="autoplay"
-                allowfullscreen
-                seamless
-                scrolling="no"
-                src="<?= htmlspecialchars($game['ADRESA']) ?>"></iframe>
+            <!-- KONTJENER S HRou + tlačítko fullscreen -->
+            <div id="gameContainer" class="game-wrapper">
+              <button type="button" class="btn-primary fullscreen-btn" id="fullscreenToggle">
+                Na celou obrazovku
+              </button>
+
+              <iframe
+                  id="hra"
+                  class="game-frame"
+                  frameborder="0"
+                  height="600"
+                  width="100%"
+                  allow="autoplay"
+                  allowfullscreen
+                  seamless
+                  scrolling="no"
+                  src="<?= htmlspecialchars($game['ADRESA']) ?>"></iframe>
+            </div>
 
             <hr>
             <h2>Komentáře</h2>
@@ -145,5 +174,35 @@ if (!empty($_SESSION['user_id'])) {
         </div>
     </div>
 </main>
+
+<script>
+// Fullscreen tlačítko pro kontejner s hrou
+const container = document.getElementById('gameContainer');
+const btn = document.getElementById('fullscreenToggle');
+
+function isFullscreen() {
+  return document.fullscreenElement === container;
+}
+
+btn.addEventListener('click', () => {
+  if (!isFullscreen()) {
+    if (container.requestFullscreen) {
+      container.requestFullscreen();
+    }
+    btn.textContent = 'Ukončit celou obrazovku';
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+});
+
+document.addEventListener('fullscreenchange', () => {
+  if (!isFullscreen()) {
+    btn.textContent = 'Na celou obrazovku';
+  }
+});
+</script>
+
 </body>
 </html>
