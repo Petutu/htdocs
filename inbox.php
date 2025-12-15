@@ -64,7 +64,7 @@ if (!empty($_SESSION['user_id'])) {
           <a href="login.php">Přihlášení</a>
       <?php else: ?>
           <a href="inbox.php">
-            Doručené (<span id="unreadCount">0</span>)
+            Doručené (<span id="unreadCount">0</span> )
           </a>
           <a href="sent.php">Odeslané</a>
           <a href="compose.php">Napsat</a>
@@ -113,7 +113,7 @@ if (!empty($_SESSION['user_id'])) {
                 <form method="post" action="actions/mark_read.php" style="display:inline;">
                   <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf) ?>">
                   <input type="hidden" name="id" value="<?= (int)$m['ID'] ?>">
-                  <button type="submit">Označit</button>
+                  <button class= "read-btn" type="submit">Označit</button>
                 </form>
               <?php endif; ?>
             </td>

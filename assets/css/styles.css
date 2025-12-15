@@ -194,6 +194,24 @@ min-width: 150px;
 transform: translateY(-2px);
 box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
 }
+.read-btn {
+background: linear-gradient(180deg, var(--accent-light), var(--button-accent-dark));
+color: var(--button-text);
+padding: 10px 20px;
+margin: 10px;
+border-radius: var(--radius-sm);
+font-weight: 600;
+border: none;
+cursor: pointer;
+box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2); 
+transition: transform 0.2s, box-shadow 0.2s;
+min-width: 150px;
+}
+.read-btn:hover {
+transform: translateY(-2px);
+box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+}
+
 .link{color:var(--muted); text-decoration:none; font-size:14px; transition: color 0.2s}
 .link:hover{color:var(--accent-light)}
 
@@ -306,11 +324,11 @@ flex-shrink: 0;
 .photo {
   width: 100px;
   height: 100px;
-  object-fit: cover;
+  object-fit: scale-down;
+  
   margin-bottom: 20px;
-  border: 3px solid var(--accent);
+  border: 1px solid var(--accent);
 }
-
 .input-wrap {
     display: flex;
     align-items: center;
@@ -339,7 +357,7 @@ margin-right: 10px;
 }
 
 /* ==================================== */
-/* GAME CARDS & STATS */
+/* GAME CARDS */
 /* ==================================== */
 
 .game-card {
@@ -438,6 +456,4 @@ margin-right: 10px;
   .nav nav{ gap: 12px; }
 .stats-grid { grid-template-columns: 1fr; }
 }
-@media (max-width: 400px) {
-  .nav nav{ flex-direction: column; width: 100%; }
-}
+

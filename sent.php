@@ -96,7 +96,6 @@ if (!empty($_SESSION['user_id'])) {
         <tbody>
         <?php while ($m = $items->fetch_assoc()): ?>
           <?php
-            // 🔓 dešifrování šifrovaných polí
             $subject = decrypt_field($m['PREDMET']);
             $body    = decrypt_field($m['OBSAH']);
           ?>
