@@ -7,80 +7,77 @@ require_once __DIR__.'/config/security.php';
 <!doctype html>
 <html lang="cs">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Přihlášení – Online Hry IS</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/styles.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Přihlášení – Online Hry IS</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
-  <header class="nav">
-    <div class="brand">🎮 Online Hry IS</div>
-   <nav>
-  <a href="index.php">Domů</a>
+<header class="nav">
+<div class="brand">🎮 Online Hry IS</div>
+<nav>
+<a href="index.php">Domů</a>
 
-  <?php if (empty($_SESSION['user_id'])): ?>
-      <!-- Uživatel není přihlášen → zobrazit Registraci a Přihlášení -->
-      <a href="register.php">Registrace</a>
-      <a href="login.php">Přihlášení</a>
-  <?php else: ?>
-      <!-- Uživatel je přihlášen → zobrazit zprávy + odhlášení -->
-      <a href="inbox.php">
-        Doručené (<span id="unreadCount">0</span>)
-      </a>
-      <a href="sent.php">Odeslané</a>
-      <a href="compose.php">Napsat</a>
-      <a href="profile.php">Profil</a>
-      <a href="actions/logout.php">Odhlásit</a>
-  <?php endif; ?>
+<?php if (empty($_SESSION['user_id'])): ?>
+<a href="register.php">Registrace</a>
+<a href="login.php" aria-current="page">Přihlášení</a>
+<?php else: ?>
+<a href="inbox.php">
+Doručené (<span id="unreadCount">0</span>)
+</a>
+<a href="sent.php">Odeslané</a>
+<a href="compose.php">Napsat</a>
+<a href="profile.php">Profil</a>
+<a href="actions/logout.php">Odhlásit</a>
+<?php endif; ?>
 </nav>
-  </header>
+</header>
 
-  <main class="page">
-    <div class="hero">
-      <div class="hero-inner">
-        <section class="card">
-          <h1>Přihlášení</h1>
-          <p class="lead">Přihlaste se do svého účtu a začněte hrát.</p>
+<main class="page">
+<div class="hero">
+<div class="hero-inner">
+<section class="card-large">
+<h1>Přihlášení</h1>
+<p class="lead" style="color: var(--muted);">Přihlaste se do svého účtu a začněte hrát.</p>
 
-          <!-- ZACHOVÁN STEJNÝ VZHLED, jen akce míří na PHP backend + CSRF -->
-          <form method="post" action="actions/login_action.php" id="loginForm" novalidate>
-            <input type="hidden" name="csrf" value="<?= htmlspecialchars(ensure_csrf()) ?>">
+<form method="post" action="actions/login_action.php" id="loginForm" novalidate>
+<input type="hidden" name="csrf" value="<?= htmlspecialchars(ensure_csrf()) ?>">
 
-            <label class="field">
-              <span class="field-label">Login</span>
-              <div class="input-wrap">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 6v2h18v-2c0-3.5-4-6-9-6z"/></svg>
-                <input id="login" required name="login" pattern="[A-Za-z0-9_]{4,30}" placeholder="player01" autocomplete="username" />
-              </div>
-            </label>
-
-            <label class="field">
-              <span class="field-label">Heslo</span>
-              <div class="input-wrap">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 8V7a5 5 0 0 0-10 0v1H5v12h14V8h-2zM9 7a3 3 0 0 1 6 0v1H9V7zm3 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
-                <input id="password" required type="password" name="password" placeholder="••••••••" autocomplete="current-password" />
-              </div>
-            </label>
-
-            <div class="actions">
-              <button class="btn-primary" type="submit">Přihlásit</button>
-              <a class="link" href="register.php">Nemám účet → Registrace</a>
-            </div>
-          </form>
-        </section>
-
-        <aside class="panel">
-          <h2>Proč se registrovat?</h2>
-          <ul>
-            <li>Ukládání skóre a pokroku</li>
-            <li>Speciální soutěže a odměny</li>
-            <li>Rychlé přihlášení a správa profilu</li>
-            <h2><a class="link" href="register.php">Chci výhody!</a></h2>
-          </ul>
-        </aside>
-      </div>
+<label class="field">
+    <span class="field-label">Login</span> 
+    <div class="input-wrap">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 6v2h18v-2c0-3.5-4-6-9-6z"/></svg>
+        <input id="login" required name="login" pattern="[A-Za-z0s9_]{4,30}" placeholder="player01" autocomplete="username"/>
     </div>
-  </main>
+</label>
+
+<label class="field">
+    <span class="field-label">Heslo</span>
+    <div class="input-wrap">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 8V7a5 5 0 0 0-10 0v1H5v12h14V8h-2zM9 7a3 3 0 0 1 6 0v1H9V7zm3 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+        <input id="password" required type="password" name="password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+</label>
+
+<div class="actions">
+<button class="btn-primary" type="submit">Přihlásit</button>
+<a class="link" href="register.php">Nemám účet → Registrace</a>
+</div>
+</form>
+</section>
+
+<aside class="card">
+<h2>Proč se registrovat?</h2>
+<ul style="list-style: none; padding: 0; margin-top: 10px;">
+<li style="margin-bottom: 8px; color: var(--text);">✅ Ukládání skóre a pokroku</li>
+<li style="margin-bottom: 8px; color: var(--text);">🏆 Speciální soutěže a odměny</li>
+<li style="margin-bottom: 20px; color: var(--text);">👤 Rychlé přihlášení a správa profilu</li>
+<h2><a class="link" href="register.php">Chci výhody!</a></h2>
+</ul>
+</aside>
+</div>
+</div>
+</main>
 </body>
 </html>

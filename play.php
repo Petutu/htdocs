@@ -146,8 +146,7 @@ if (!empty($_SESSION['user_id'])) {
 
                 <label class="field">
                     <span class="field-label">Váš komentář</span>
-                    <textarea name="comment" rows="4" required
-                              placeholder="Napište, jak se vám hra líbí..."></textarea>
+                    <textarea placeholder="Napište svůj komentář..." class="comment-input"></textarea>
                 </label>
 
                 <button type="submit" class="btn-primary">Odeslat komentář</button>
